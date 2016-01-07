@@ -16,7 +16,7 @@ import com.turn.ttorrent.client.SharedTorrent;
 public class ClientTor {
 	private static String s = System.getenv("OPENSHIFT_DATA_DIR");
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "/tor", method = RequestMethod.GET)
 	public @ResponseBody String upload(Model model,@ModelAttribute("AttributeName") final String value) {
 		// First, instantiate the Client object.
 				Client client;
