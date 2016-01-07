@@ -31,7 +31,7 @@ public class home {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(home.class);
-	private static String s = "C:\\Users\\PankajKumar\\Downloads\\Video";
+	private static String s = System.getenv("OPENSHIFT_DATA_DIR");
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String upload(Model model,@ModelAttribute("AttributeName") final String value) {
