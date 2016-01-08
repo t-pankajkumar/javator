@@ -79,8 +79,8 @@ public class ConnectionHandler implements Runnable {
 	private static final Logger logger =
 		LoggerFactory.getLogger(ConnectionHandler.class);
 
-	public static final int PORT_RANGE_START = 49152;
-	public static final int PORT_RANGE_END = 65534;
+	public static final int PORT_RANGE_START = 7999;
+	public static final int PORT_RANGE_END = 8555;
 
 	private static final int OUTBOUND_CONNECTIONS_POOL_SIZE = 20;
 	private static final int OUTBOUND_CONNECTIONS_THREAD_KEEP_ALIVE_SECS = 10;
