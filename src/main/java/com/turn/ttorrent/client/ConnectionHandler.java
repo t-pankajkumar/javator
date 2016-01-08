@@ -123,7 +123,7 @@ public class ConnectionHandler implements Runnable {
 				port <= ConnectionHandler.PORT_RANGE_END;
 				port++) {
 			InetSocketAddress tryAddress =
-				new InetSocketAddress(System.getenv("OPENSHIFT_INTERNAL_IP"), 80);
+				new InetSocketAddress("127.5.238.129", 9999);
 
 			try {
 				this.channel = ServerSocketChannel.open();
