@@ -33,7 +33,7 @@ public class ClientTor {
 					// output directory. Partials downloads are automatically
 					// recovered.
 					SharedTorrent.fromFile(new File(s + File.separator
-							+ "k.torrent"), new File(s)));
+							+ "dd.torrent"), new File(s)));
 
 			// You can optionally set download/upload rate limits
 			// in kB/second. Setting a limit to 0.0 disables rate
