@@ -61,13 +61,13 @@ public class home {
 		try {
 			URL url = new URL(url_d);
 			//InputStream in = new FileInputStream("C:\\Users\\PankajKumar\\Push.rar");
-			InputStream x = new BufferedInputStream(url.openStream());
+			//InputStream x = new BufferedInputStream(url.openStream());
 			// Upload Files to Dropbox
 			String fileName = url_d.substring( url_d.lastIndexOf('/')+1, url_d.length() );
 
 			//String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
 			
-			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(x);
+			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(new BufferedInputStream(url.openStream()));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
