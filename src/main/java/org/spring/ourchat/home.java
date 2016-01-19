@@ -62,7 +62,7 @@ public class home {
 			String fileName = url_d.substring( url_d.lastIndexOf('/')+1, url_d.length() );
 
 			//String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
-			
+			System.out.println(Runtime.getRuntime().totalMemory());
 			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(url.openStream());
 			
 		} catch (MalformedURLException e) {
