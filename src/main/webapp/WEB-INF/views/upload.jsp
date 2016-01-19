@@ -19,6 +19,13 @@
 			<button type="submit" class="btn btn-default">Upload</button>
 		</div>
 	</form>
+	<form method="POST" action="db" enctype="multipart/form-data">
+		<div class="form-group">
+			<label for="exampleInputEmail1">Url to upload:</label> 
+			<input type="text" name="url_dd"><br />
+			<button type="submit" class="btn btn-default">Copy to Dropbox</button>
+		</div>
+	</form>
 	<table class="table table-striped table-condensed">
 		<tr>
 			<th>File Name</th>
