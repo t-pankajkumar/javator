@@ -1,12 +1,10 @@
 package org.spring.ourchat;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,8 +14,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -67,7 +63,8 @@ public class home {
 
 			//String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
 			
-			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(new BufferedInputStream(url.openStream()));
+			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(url.openStream());
+			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
