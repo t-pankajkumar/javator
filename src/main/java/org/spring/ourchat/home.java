@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -60,10 +61,12 @@ public class home {
 			//InputStream x = new BufferedInputStream(url.openStream());
 			// Upload Files to Dropbox
 			String fileName = url_d.substring( url_d.lastIndexOf('/')+1, url_d.length() );
-
+			
 			//String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
 			System.out.println(Runtime.getRuntime().totalMemory());
+			System.out.println(client.files.uploadSessionStart());
 			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(url.openStream());
+			
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
