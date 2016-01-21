@@ -26,6 +26,12 @@
 			<button type="submit" class="btn btn-default">Copy to Dropbox</button>
 		</div>
 	</form>
+	<form class="dropzone" id="my-awesome-dropzone"
+		action="UploadServlet" method="post" modelAttribute="up"
+		enctype="multipart/form-data">
+		<input name="file2" id="file2" type="file" />
+		<br />
+	</form>
 	<table class="table table-striped table-condensed">
 		<tr>
 			<th>File Name</th>

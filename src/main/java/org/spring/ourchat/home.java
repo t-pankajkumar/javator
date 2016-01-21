@@ -1,6 +1,5 @@
 package org.spring.ourchat;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +10,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -22,14 +22,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.DbxFiles;
-import com.dropbox.core.v2.DbxFiles.UploadException;
+import com.dropbox.core.DbxWriteMode;
 
 /**
  * Handles requests for the application home page.
@@ -54,20 +55,19 @@ public class home {
 	@RequestMapping(value = "/db", method = RequestMethod.POST)
 	public String uploadTODropBox(Model model,final RedirectAttributes redirectAttrs,
 			@ModelAttribute("AttributeName") final String value,@ModelAttribute("url_dd") String url_d) {
-		DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial","en_US");
+/*		DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial","en_US");
 		DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
 		try {
 			URL url = new URL(url_d);
 			//InputStream in = new FileInputStream("C:\\Users\\PankajKumar\\Push.rar");
-			byte data[] = new byte[1024];
-			InputStream x = new BufferedInputStream(url.openStream(),8*1024);
+			//InputStream x = new BufferedInputStream(url.openStream());
 			// Upload Files to Dropbox
 			String fileName = url_d.substring( url_d.lastIndexOf('/')+1, url_d.length() );
 			
 			//String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
 			System.out.println(Runtime.getRuntime().totalMemory());
 			System.out.println(client.files.uploadSessionStart());
-			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(x);
+			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(url.openStream());
 			
 			
 		} catch (MalformedURLException e) {
@@ -79,7 +79,7 @@ public class home {
 		} catch (DbxException e) {
 			e.printStackTrace();
 		}
-		redirectAttrs.addFlashAttribute("AttributeName", "");
+		redirectAttrs.addFlashAttribute("AttributeName", "");*/
 		return "redirect:/";
 	}
 
@@ -100,7 +100,40 @@ public class home {
 		}
 		return li;
 	}
+	@RequestMapping(value = "/UploadServlet", method = RequestMethod.POST)
+	public @ResponseBody String upload(@ModelAttribute("up") MUlti mp,
+			Locale locale, Model model) throws IOException, DbxException {
+		// Get your app key and secret from the Dropbox developers website.
 
+		DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0",
+				Locale.getDefault().toString());
+		MultipartFile mpf = mp.getFile();
+		System.out.println(mpf);
+		String fname = mpf.getOriginalFilename();
+		long le = mpf.getSize();
+		InputStream is = mpf.getInputStream();
+		//System.out.println(le / MB);
+		String result;
+		if (true) {
+			String accessToken = "sO2hcTj-f8cAAAAAAAAAF-2VzuJxoHcM-lt_3niliVeQKyIKubpaVbU0KnNCX7MJ";
+			DbxClient client = new DbxClient(config, accessToken);
+			try {
+				DbxEntry.File uploadedFile = client.uploadFile(
+						"/" + fname + "", DbxWriteMode.add(), le, is);
+				System.out.println(uploadedFile.clientMtime);
+				System.out.println("Uploaded: " + uploadedFile.toString());
+			} finally {
+				is.close();
+			}
+			result = "Successful";
+		} else {
+			result = "File size exceed the limit \n Please request admin to increase the limit :) !";
+		}
+		System.out.println("Done");
+		model.addAttribute("result", result);
+		return result;
+
+	}
 	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
 	public String uploadFileHandler(final RedirectAttributes redirectAttrs,
 			@RequestParam("file") MultipartFile file, Model model) {
