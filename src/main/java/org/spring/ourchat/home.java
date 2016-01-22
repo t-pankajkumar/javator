@@ -108,9 +108,9 @@ public class home {
         URL url = new URL(url_d);
         BufferedInputStream bis = new BufferedInputStream(url.openStream());
         FileOutputStream fis = new FileOutputStream(s+File.pathSeparator+fileName);
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
         int count=0;
-        while((count = bis.read(buffer,0,1024)) != -1)
+        while((count = bis.read(buffer,0,4096)) != -1)
         {
             fis.write(buffer, 0, count);
         }
