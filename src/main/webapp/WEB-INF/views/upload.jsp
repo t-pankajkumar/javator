@@ -11,39 +11,42 @@
 	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div class="container">${msg}
-	<form method="POST" action="uploadFile" enctype="multipart/form-data">
-		<div class="form-group">
-			<label for="exampleInputEmail1">File to upload:</label> 
-			<input type="file" name="file"><br />
-			<button type="submit" class="btn btn-default">Upload</button>
-		</div>
-	</form>
-	<form method="POST" action="db" enctype="multipart/form-data">
-		<div class="form-group">
-			<label for="exampleInputEmail1">Url to upload:</label> 
-			<input type="text" name="url_dd"><br />
-			<button type="submit" class="btn btn-default">Copy to Dropbox</button>
-		</div>
-	</form>
-	<form class="dropzone" id="my-awesome-dropzone"
-		action="UploadServlet" method="post" modelAttribute="up"
-		enctype="multipart/form-data">
-		<input name="file2" id="file2" type="file" />
-		<br />
-	</form>
-	<table class="table table-striped table-condensed">
-		<tr>
-			<th>File Name</th>
-			<th>Size</th>
-		</tr>
-		<c:forEach var="file" items="${file}">
+	<div class="container">${msg}
+		<form method="POST" action="uploadFile" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="exampleInputEmail1">File to upload:</label> <input
+					type="file" name="file"><br />
+				<button type="submit" class="btn btn-default">Upload</button>
+			</div>
+		</form>
+		<form method="POST" action="db" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="exampleInputEmail1">Url to upload:</label> <input
+					type="text" name="url_dd"><br />
+				<button type="submit" class="btn btn-default">Copy to
+					Dropbox</button>
+			</div>
+		</form>
+		<form method="POST" action="uploadFileUrl" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="exampleInputEmail1">Url to upload:</label> <input
+					type="text" name="url_dd"><br />
+				<button type="submit" class="btn btn-default">Copy to
+					Own</button>
+			</div>
+		</form>
+		<table class="table table-striped table-condensed">
 			<tr>
-				<td><a href="<c:url value="/download?fname=${file.key}" />">${file.key}</a></td>
-				<td style="text-align:right">${file.value} MB</td>
+				<th>File Name</th>
+				<th>Size</th>
 			</tr>
-		</c:forEach>
-	</table>
-</div>
+			<c:forEach var="file" items="${file}">
+				<tr>
+					<td><a href="<c:url value="/download?fname=${file.key}" />">${file.key}</a></td>
+					<td style="text-align: right">${file.value}MB</td>
+				</tr>
+			</c:forEach>
+		</table>
+	</div>
 </body>
 </html>
