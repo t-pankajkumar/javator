@@ -102,11 +102,12 @@ public class home {
 	public String uploadFileHandlerown(final RedirectAttributes redirectAttrs,
 			@ModelAttribute("url_dd") String url_d, Model model) throws IOException {
 		String message = "";
-		String rootPath = System.getProperty("catalina.home");
+		//String rootPath = System.getProperty("catalina.home");
 		//String name = file.getOriginalFilename();
+		String fileName = url_d.substring( url_d.lastIndexOf('/')+1, url_d.length() );
         URL url = new URL(url_d);
         BufferedInputStream bis = new BufferedInputStream(url.openStream());
-        FileOutputStream fis = new FileOutputStream(s);
+        FileOutputStream fis = new FileOutputStream(s+File.pathSeparator+fileName);
         byte[] buffer = new byte[1024];
         int count=0;
         while((count = bis.read(buffer,0,1024)) != -1)
