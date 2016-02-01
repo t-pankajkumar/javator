@@ -38,6 +38,7 @@
 		<table class="table table-striped table-condensed">
 			<tr>
 				<th>File Name</th>
+				<th></th>
 				<th>Size</th>
 			</tr>
 			<c:forEach var="file" items="${file}">
