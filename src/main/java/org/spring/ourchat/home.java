@@ -62,7 +62,7 @@ public class home {
 	public String uploadTODropBox(Model model,final RedirectAttributes redirectAttrs,
 			@ModelAttribute("AttributeName") final String value,@ModelAttribute("url_dd") String url_d) {
 		// Create Dropbox client
-				long buffer = 25165824; // 64
+				long buffer = 33554432; // 64
 				DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial",
 						"en_US");
 				DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
@@ -70,30 +70,30 @@ public class home {
 					URL url = new URL(url_d);
 					String sessionId = "";
 					// Upload Files to Dropbox
-					String fileName = url_d.substring(url_d.lastIndexOf('/') + 1,url_d.length());
-					HttpURLConnection hc0 = (HttpURLConnection) url.openConnection();
-					hc0.connect();
-					long size = hc0.getContentLengthLong();
+					String fileName =  java.net.URLDecoder.decode(url_d.substring(url_d.lastIndexOf('/') + 1,url_d.length()), "UTF-8");;
+					HttpURLConnection getLength = (HttpURLConnection) url.openConnection();
+					getLength.connect();
+					long size = getLength.getContentLengthLong();
 					// Start
 					HttpURLConnection hc = (HttpURLConnection) url.openConnection();
 					hc.addRequestProperty("Range", "bytes=0-"+buffer);
 					hc.connect();
-					DbxFiles.UploadSessionStartUploader re = client.files.uploadSessionStart();
-					re.getBody().write(IOUtils.toByteArray(hc.getInputStream()));
-					UploadSessionStartResult sa = re.finish();
+					DbxFiles.UploadSessionStartUploader result = client.files.uploadSessionStart();
+					result.getBody().write(IOUtils.toByteArray(hc.getInputStream()));
+					UploadSessionStartResult sa = result.finish();
 					sessionId = sa.sessionId;
 					hc.disconnect();
 					if (size > 0) {
-						System.out.println("large");
+						//System.out.println("large");
 						
 						long s2 = buffer;
 						long tmp = 0;
-						System.out.println("0"+" "+buffer);
+						//System.out.println("0"+" "+buffer);
 						while (tmp <= size && (buffer + s2) < size) {
 							buffer++;
 							tmp = buffer + s2;
 							if (tmp < size) {
-								System.out.println(buffer + "\t" + (tmp)+"\t"+(tmp-buffer));
+								//System.out.println(buffer + "\t" + (tmp)+"\t"+(tmp-buffer));
 								// Append
 								HttpURLConnection hc1 = (HttpURLConnection) url.openConnection();
 								hc1.addRequestProperty("Range", "bytes="+buffer+"-"+tmp);
@@ -105,7 +105,7 @@ public class home {
 							}
 						}
 						if((tmp+1)+buffer>size){
-						System.out.println(tmp + 1 + "\t" + size +"\t"+(tmp-size));
+						//System.out.println(tmp + 1 + "\t" + size +"\t"+(tmp-size));
 						// finish
 						HttpURLConnection hc2 = (HttpURLConnection) url.openConnection();
 						hc2.addRequestProperty("Range", "bytes="+(tmp+1)+"-"+size);
@@ -116,8 +116,8 @@ public class home {
 								new CommitInfo("/" + fileName, DbxFiles.WriteMode.add,false, new Date(), false))
 								.run(hc2.getInputStream());
 						// End
-						System.out.println(nn.toStringMultiline());
-						redirectAttrs.addFlashAttribute("AttributeName", nn.toStringMultiline());
+						//System.out.println(nn.toStringMultiline());
+						redirectAttrs.addFlashAttribute("AttributeName", "Successfully uploaded to dropbox");
 						}
 					}
 					
