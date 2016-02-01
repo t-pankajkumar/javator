@@ -64,7 +64,7 @@ public class home {
 			
 			//String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
 			System.out.println(Runtime.getRuntime().totalMemory());
-			System.out.println(client.files.uploadSessionStart());
+			//System.out.println(client.files.uploadSessionStart());
 			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(url.openStream());
 			
 			
