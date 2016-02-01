@@ -62,7 +62,7 @@ public class home {
 	public String uploadTODropBox(Model model,final RedirectAttributes redirectAttrs,
 			@ModelAttribute("AttributeName") final String value,@ModelAttribute("url_dd") String url_d) {
 		// Create Dropbox client
-				long buffer = 67108864; // 64
+				long buffer = 25165824; // 64
 				DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial",
 						"en_US");
 				DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
