@@ -94,7 +94,7 @@ public class home {
 							tmp = buffer + s2;
 							if (tmp < size) {
 								System.out.println(buffer + "\t" + (tmp)+"\t"+(tmp-buffer));
-								// Appending
+								// Append
 								HttpURLConnection hc1 = (HttpURLConnection) url.openConnection();
 								hc1.addRequestProperty("Range", "bytes="+buffer+"-"+tmp);
 								hc1.connect();
