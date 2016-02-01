@@ -22,7 +22,7 @@
 		<form method="POST" action="db" enctype="multipart/form-data">
 			<div class="form-group">
 				<label for="exampleInputEmail1">Url to upload:</label> <input
-					type="text" name="url_dd"><br />
+					type="text" name="url_dd">
 				<button type="submit" class="btn btn-default">Copy to
 					Dropbox</button>
 			</div>
@@ -30,7 +30,7 @@
 		<form method="POST" action="uploadFileUrl" enctype="multipart/form-data">
 			<div class="form-group">
 				<label for="exampleInputEmail1">Url to upload:</label> <input
-					type="text" name="url_dd"><br />
+					type="text" name="url_dd">
 				<button type="submit" class="btn btn-default">Copy to
 					Own</button>
 			</div>
@@ -43,6 +43,7 @@
 			<c:forEach var="file" items="${file}">
 				<tr>
 					<td><a href="<c:url value="/download?fname=${file.key}" />">${file.key}</a></td>
+					<td><a href="<c:url value="/delete?fname=${file.key}" />">Delete</a></td>
 					<td style="text-align: right">${file.value}MB</td>
 				</tr>
 			</c:forEach>

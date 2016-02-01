@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.taglibs.standard.extra.spath.Path;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -307,6 +309,16 @@ public class home {
 		inputStream.close();
 		outStream.close();
 
+	}
+	
+	@RequestMapping(value = "/delete", method = RequestMethod.GET)
+	public String doDelete(@RequestParam("fname") String fname,
+			HttpServletRequest request, HttpServletResponse response,final RedirectAttributes redirectAttrs)
+			throws IOException {
+			File file = new File(s+File.pathSeparator+fname);
+			file.deleteOnExit();
+			redirectAttrs.addFlashAttribute("AttributeName", "File "+fname+" deleted");
+			return "redirect:/";
 	}
 
 	/**
