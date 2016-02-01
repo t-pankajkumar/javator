@@ -7,14 +7,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -28,7 +31,12 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.DbxFiles;
+import com.dropbox.core.v2.DbxFiles.CommitInfo;
+import com.dropbox.core.v2.DbxFiles.FileMetadata;
 import com.dropbox.core.v2.DbxFiles.UploadException;
+import com.dropbox.core.v2.DbxFiles.UploadSessionAppendBuilder;
+import com.dropbox.core.v2.DbxFiles.UploadSessionCursor;
+import com.dropbox.core.v2.DbxFiles.UploadSessionStartResult;
 
 /**
  * Handles requests for the application home page.
@@ -53,19 +61,67 @@ public class home {
 	@RequestMapping(value = "/db", method = RequestMethod.POST)
 	public String uploadTODropBox(Model model,final RedirectAttributes redirectAttrs,
 			@ModelAttribute("AttributeName") final String value,@ModelAttribute("url_dd") String url_d) {
-		DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial","en_US");
+		// Create Dropbox client
+		long buffer = 67108864; // 64
+		DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial",
+				"en_US");
 		DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
 		try {
 			URL url = new URL(url_d);
-			//InputStream in = new FileInputStream("C:\\Users\\PankajKumar\\Push.rar");
-			//InputStream x = new BufferedInputStream(url.openStream());
+			String sessionId = "";
 			// Upload Files to Dropbox
-			String fileName = url_d.substring( url_d.lastIndexOf('/')+1, url_d.length() );
+			String fileName = url_d.substring(url_d.lastIndexOf('/') + 1,url_d.length());
+			HttpURLConnection hc0 = (HttpURLConnection) url.openConnection();
+			hc0.connect();
+			long size = hc0.getContentLengthLong();
+			// Start
+			HttpURLConnection hc = (HttpURLConnection) url.openConnection();
+			hc.addRequestProperty("Range", "bytes=0-"+buffer);
+			hc.connect();
+			DbxFiles.UploadSessionStartUploader re = client.files.uploadSessionStart();
+			re.getBody().write(IOUtils.toByteArray(hc.getInputStream()));
+			UploadSessionStartResult sa = re.finish();
+			sessionId = sa.sessionId;
+			hc.disconnect();
+			if (size > 0) {
+				System.out.println("large");
+				
+				long s2 = buffer;
+				long tmp = 0;
+				System.out.println("0"+" "+buffer);
+				while (tmp <= size && (buffer + s2) < size) {
+					buffer++;
+					tmp = buffer + s2;
+					if (tmp < size) {
+						System.out.println(buffer + "\t" + (tmp)+"\t"+(tmp-buffer));
+						// Append
+						HttpURLConnection hc1 = (HttpURLConnection) url.openConnection();
+						hc1.addRequestProperty("Range", "bytes="+buffer+"-"+tmp);
+						hc1.connect();
+						UploadSessionAppendBuilder re1 = client.files.uploadSessionAppendBuilder(sessionId, buffer);
+						re1.run(hc1.getInputStream());
+						hc1.disconnect();
+						buffer = tmp;
+					}
+				}
+				if((tmp+1)+buffer>size){
+				System.out.println(tmp + 1 + "\t" + size +"\t"+(tmp-size));
+				// finish
+				HttpURLConnection hc2 = (HttpURLConnection) url.openConnection();
+				hc2.addRequestProperty("Range", "bytes="+(tmp+1)+"-"+size);
+				hc2.connect();
+				UploadSessionCursor usc = new UploadSessionCursor(sessionId, (tmp+1));
+				FileMetadata nn = client.files.uploadSessionFinishBuilder(
+						usc,
+						new CommitInfo("/" + fileName, DbxFiles.WriteMode.add,
+								false, new Date(), false))
+						.run(hc2.getInputStream());
+				// End
+				//System.out.println(nn.toStringMultiline());
+				redirectAttrs.addFlashAttribute("AttributeName", nn.toStringMultiline());
+				}
+			}
 			
-			//String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
-			System.out.println(Runtime.getRuntime().totalMemory());
-			System.out.println(client.files.uploadSessionStart());
-			DbxFiles.FileMetadata metadata = client.files.uploadBuilder("/"+fileName).run(url.openStream());
 			
 			
 		} catch (MalformedURLException e) {
@@ -77,7 +133,7 @@ public class home {
 		} catch (DbxException e) {
 			e.printStackTrace();
 		}
-		redirectAttrs.addFlashAttribute("AttributeName", "");
+		
 		return "redirect:/";
 	}
 
