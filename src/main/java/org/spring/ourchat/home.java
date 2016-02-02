@@ -319,6 +319,7 @@ public class home {
 			throws IOException {
 			File file = new File(s+File.pathSeparator+fname);
 			file.deleteOnExit();
+			System.out.println(s+File.pathSeparator+fname);
 			redirectAttrs.addFlashAttribute("AttributeName", "File "+fname+" deleted");
 			return "redirect:/";
 	}
