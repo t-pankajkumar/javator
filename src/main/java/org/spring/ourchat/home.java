@@ -318,7 +318,7 @@ public class home {
 			HttpServletRequest request, HttpServletResponse response,final RedirectAttributes redirectAttrs)
 			throws IOException {
 			File file = new File(s+"/"+fname);
-			file.deleteOnExit();
+			file.delete();
 			System.out.println(s+File.pathSeparator+fname+" "+file.exists());
 			redirectAttrs.addFlashAttribute("AttributeName", "File "+fname+" deleted");
 			return "redirect:/";
