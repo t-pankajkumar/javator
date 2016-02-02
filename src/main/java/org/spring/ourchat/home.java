@@ -99,6 +99,7 @@ public class home {
 								// Append
 								HttpURLConnection hc1 = (HttpURLConnection) url.openConnection();
 								hc1.addRequestProperty("Range", "bytes="+buffer+"-"+tmp);
+								hc1.setReadTimeout(10000);
 								hc1.connect();
 								UploadSessionAppendBuilder re1 = client.files.uploadSessionAppendBuilder(sessionId, buffer);
 								re1.run(hc1.getInputStream());
@@ -111,6 +112,7 @@ public class home {
 						// finish
 						HttpURLConnection hc2 = (HttpURLConnection) url.openConnection();
 						hc2.addRequestProperty("Range", "bytes="+(tmp+1)+"-"+size);
+						hc2.setReadTimeout(10000);
 						hc2.connect();
 						UploadSessionCursor usc = new UploadSessionCursor(sessionId, (tmp+1));
 						FileMetadata nn = client.files.uploadSessionFinishBuilder(
