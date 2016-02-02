@@ -317,7 +317,7 @@ public class home {
 	public String doDelete(@RequestParam("fname") String fname,
 			HttpServletRequest request, HttpServletResponse response,final RedirectAttributes redirectAttrs)
 			throws IOException {
-			File file = new File(s+File.pathSeparator+fname);
+			File file = new File(s+"/"+fname);
 			file.deleteOnExit();
 			System.out.println(s+File.pathSeparator+fname+" "+file.exists());
 			redirectAttrs.addFlashAttribute("AttributeName", "File "+fname+" deleted");
