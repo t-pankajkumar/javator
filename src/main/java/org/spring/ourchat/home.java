@@ -96,7 +96,6 @@ public class home {
 							tmp = buffer + s2;
 							if (tmp < size) {
 								System.out.println(buffer + "\t" + (tmp)+"\t"+(tmp-buffer));
-								long start = System.currentTimeMillis();
 								// Append
 								HttpURLConnection hc1 = (HttpURLConnection) url.openConnection();
 								hc1.addRequestProperty("Range", "bytes="+buffer+"-"+tmp);
@@ -105,8 +104,6 @@ public class home {
 								UploadSessionAppendBuilder re1 = client.files.uploadSessionAppendBuilder(sessionId, buffer);
 								re1.run(hc1.getInputStream());
 								hc1.disconnect();
-								long end = System.currentTimeMillis();
-								System.out.println(s2/((end-start)*1000));
 								buffer = tmp;
 							}
 						}
