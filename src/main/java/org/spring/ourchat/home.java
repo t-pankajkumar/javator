@@ -49,7 +49,7 @@ public class home {
 	static final String ACCESS_TOKEN = "sO2hcTj-f8cAAAAAAAAAJ4HcScHm8iXSR8TSilgfzQD0Qe4jP0fIWOKuYsBtub8c";
 	private static String s = System.getenv("OPENSHIFT_DATA_DIR");
 
-	// magnet:?xt=urn:btih:0CCA4ED45B20F4BADADF02552D297BA2642E1009&dn=jquery+gems+the+easy+guide+to+the+javascript+library+for+beginners&tr=udp%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce
+	//magnet:?xt=urn:btih:0CCA4ED45B20F4BADADF02552D297BA2642E1009&dn=jquery+gems+the+easy+guide+to+the+javascript+library+for+beginners&tr=udp%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce
 	// http://onto.herokuapp.com/download/jQuery%20Gems%20The%20easy%20guide%20to%20the%20JavaScript%20library%20for%20beginners/jQueryGems.tgz
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String upload(Model model,
