@@ -68,12 +68,13 @@ public class home {
 	@RequestMapping(value = "/maps", method = RequestMethod.POST)
 	public String maps(Model model, @ModelAttribute("url") String url) {
 		Document doc;
+		String m = "";
 		try {
 			doc = (Document) Jsoup.connect(html).get();
 			Elements links = doc.select("a[href*=MIR_HR.jpg]");
-			for (Element s : links) {
-				System.out.println(s.attr("href"));
-				InputStream in = new BufferedInputStream(new URL(html+s.attr("href")).openStream());
+			for (Element l : links) {
+				//System.out.println(l.attr("href"));
+				InputStream in = new BufferedInputStream(new URL(html+l.text()).openStream());
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				byte[] buf = new byte[1024];
 				int n = 0;
@@ -83,15 +84,17 @@ public class home {
 				out.close();
 				in.close();
 				byte[] response = out.toByteArray();
-
-				FileOutputStream fos = new FileOutputStream(s + File.pathSeparator + s.text());
+				File f = new File(s + File.pathSeparator + l.text());
+				FileOutputStream fos = new FileOutputStream(f);
 				fos.write(response);
 				fos.close();
+				m = "OK";
 			}
 		} catch (IOException e) {
+			m = ":(";
 			e.printStackTrace();
 		}
-		return null;
+		return m;
 	}
 
 	@RequestMapping(value = "/db", method = RequestMethod.POST)
