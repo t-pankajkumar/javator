@@ -50,7 +50,7 @@ import com.dropbox.core.v2.DbxFiles.UploadSessionStartResult;
 @Controller
 public class home {
 
-	static final String ACCESS_TOKEN = "sO2hcTj-f8cAAAAAAAAAJ4HcScHm8iXSR8TSilgfzQD0Qe4jP0fIWOKuYsBtub8c";
+	static final String ACCESS_TOKEN = "";
 	private static String s = System.getenv("OPENSHIFT_DATA_DIR");
 	static String html = "http://satellite.imd.gov.in/archive/CYCLONE-IMAGES/HUDHUD_2014/";
 
