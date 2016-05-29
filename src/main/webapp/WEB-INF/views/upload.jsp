@@ -19,6 +19,11 @@
 				<button type="submit" class="btn btn-default">Upload</button>
 			</div>
 		</form>
+		<form method="POST" action="maps">
+			<div class="form-group">
+				<button type="submit" class="btn btn-default">Maps</button>
+			</div>
+		</form>
 		<form method="POST" action="db" enctype="multipart/form-data">
 			<div class="form-group">
 				<label for="exampleInputEmail1">Url to upload:</label> <input

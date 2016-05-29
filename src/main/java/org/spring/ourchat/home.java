@@ -2,15 +2,16 @@ package org.spring.ourchat;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -19,7 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.taglibs.standard.extra.spath.Path;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -48,8 +52,9 @@ public class home {
 
 	static final String ACCESS_TOKEN = "sO2hcTj-f8cAAAAAAAAAJ4HcScHm8iXSR8TSilgfzQD0Qe4jP0fIWOKuYsBtub8c";
 	private static String s = System.getenv("OPENSHIFT_DATA_DIR");
+	static String html = "http://satellite.imd.gov.in/archive/CYCLONE-IMAGES/HUDHUD_2014/";
 
-	//magnet:?xt=urn:btih:0CCA4ED45B20F4BADADF02552D297BA2642E1009&dn=jquery+gems+the+easy+guide+to+the+javascript+library+for+beginners&tr=udp%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce
+	// magnet:?xt=urn:btih:0CCA4ED45B20F4BADADF02552D297BA2642E1009&dn=jquery+gems+the+easy+guide+to+the+javascript+library+for+beginners&tr=udp%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce
 	// http://onto.herokuapp.com/download/jQuery%20Gems%20The%20easy%20guide%20to%20the%20JavaScript%20library%20for%20beginners/jQueryGems.tgz
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String upload(Model model,
@@ -60,83 +65,127 @@ public class home {
 		return "upload";
 	}
 
-	@RequestMapping(value = "/db", method = RequestMethod.POST)
-	public String uploadTODropBox(Model model,final RedirectAttributes redirectAttrs,
-			@ModelAttribute("AttributeName") final String value,@ModelAttribute("url_dd") String url_d) {
-		// Create Dropbox client
-				long buffer = 33554432; // 32mb buffer
-				DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial",
-						"en_US");
-				DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
-				try {
-					URL url = new URL(url_d);
-					String sessionId = "";
-					// Upload Files to Dropbox
-					String fileName =  java.net.URLDecoder.decode(url_d.substring(url_d.lastIndexOf('/') + 1,url_d.length()), "UTF-8");;
-					HttpURLConnection getLength = (HttpURLConnection) url.openConnection();
-					getLength.connect();
-					long size = getLength.getContentLengthLong();
-					// Start
-					HttpURLConnection hc = (HttpURLConnection) url.openConnection();
-					hc.addRequestProperty("Range", "bytes=0-"+buffer);
-					hc.connect();
-					DbxFiles.UploadSessionStartUploader result = client.files.uploadSessionStart();
-					result.getBody().write(IOUtils.toByteArray(hc.getInputStream()));
-					UploadSessionStartResult sa = result.finish();
-					sessionId = sa.sessionId;
-					hc.disconnect();
-					if (size > 0) {
-						//System.out.println("large ");
-						
-						long s2 = buffer;
-						long tmp = 0;
-						//System.out.println("0"+" "+buffer);
-						while (tmp <= size && (buffer + s2) < size) {
-							buffer++;
-							tmp = buffer + s2;
-							if (tmp < size) {
-								System.out.println(buffer + "\t" + (tmp)+"\t"+(tmp-buffer));
-								// Append
-								HttpURLConnection hc1 = (HttpURLConnection) url.openConnection();
-								hc1.addRequestProperty("Range", "bytes="+buffer+"-"+tmp);
-								hc1.setReadTimeout(10000);
-								hc1.connect();
-								UploadSessionAppendBuilder re1 = client.files.uploadSessionAppendBuilder(sessionId, buffer);
-								re1.run(hc1.getInputStream());
-								hc1.disconnect();
-								buffer = tmp;
-							}
-						}
-						if((tmp+1)+buffer>size){
-						//System.out.println(tmp + 1 + "\t" + size +"\t"+(tmp-size));
-						// finish
-						HttpURLConnection hc2 = (HttpURLConnection) url.openConnection();
-						hc2.addRequestProperty("Range", "bytes="+(tmp+1)+"-"+size);
-						hc2.setReadTimeout(10000);
-						hc2.connect();
-						UploadSessionCursor usc = new UploadSessionCursor(sessionId, (tmp+1));
-						FileMetadata nn = client.files.uploadSessionFinishBuilder(
-								usc,
-								new CommitInfo("/" + fileName, DbxFiles.WriteMode.add,false, new Date(), false))
-								.run(hc2.getInputStream());
-						// End
-						System.out.println("Done");
-						redirectAttrs.addFlashAttribute("AttributeName", "Successfully uploaded to dropbox");
-						}
-					}
-					
-					
-					
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (UploadException e) {
-					e.printStackTrace();
-				} catch (DbxException e) {
-					e.printStackTrace();
+	@RequestMapping(value = "/maps", method = RequestMethod.POST)
+	public String maps(Model model, @ModelAttribute("url") String url) {
+		Document doc;
+		try {
+			doc = (Document) Jsoup.connect(html).get();
+			Elements links = doc.select("a[href*=MIR_HR.jpg]");
+			for (Element s : links) {
+				System.out.println(s.attr("href"));
+				InputStream in = new BufferedInputStream(new URL(html+s.attr("href")).openStream());
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				byte[] buf = new byte[1024];
+				int n = 0;
+				while (-1 != (n = in.read(buf))) {
+					out.write(buf, 0, n);
 				}
-		
+				out.close();
+				in.close();
+				byte[] response = out.toByteArray();
+
+				FileOutputStream fos = new FileOutputStream(s + File.pathSeparator + s.text());
+				fos.write(response);
+				fos.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@RequestMapping(value = "/db", method = RequestMethod.POST)
+	public String uploadTODropBox(Model model,
+			final RedirectAttributes redirectAttrs,
+			@ModelAttribute("AttributeName") final String value,
+			@ModelAttribute("url_dd") String url_d) {
+		// Create Dropbox client
+		long buffer = 33554432; // 32mb buffer
+		DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial",
+				"en_US");
+		DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
+		try {
+			URL url = new URL(url_d);
+			String sessionId = "";
+			// Upload Files to Dropbox
+			String fileName = java.net.URLDecoder
+					.decode(url_d.substring(url_d.lastIndexOf('/') + 1,
+							url_d.length()), "UTF-8");
+			;
+			HttpURLConnection getLength = (HttpURLConnection) url
+					.openConnection();
+			getLength.connect();
+			long size = getLength.getContentLengthLong();
+			// Start
+			HttpURLConnection hc = (HttpURLConnection) url.openConnection();
+			hc.addRequestProperty("Range", "bytes=0-" + buffer);
+			hc.connect();
+			DbxFiles.UploadSessionStartUploader result = client.files
+					.uploadSessionStart();
+			result.getBody().write(IOUtils.toByteArray(hc.getInputStream()));
+			UploadSessionStartResult sa = result.finish();
+			sessionId = sa.sessionId;
+			hc.disconnect();
+			if (size > 0) {
+				// System.out.println("large ");
+
+				long s2 = buffer;
+				long tmp = 0;
+				// System.out.println("0"+" "+buffer);
+				while (tmp <= size && (buffer + s2) < size) {
+					buffer++;
+					tmp = buffer + s2;
+					if (tmp < size) {
+						System.out.println(buffer + "\t" + (tmp) + "\t"
+								+ (tmp - buffer));
+						// Append
+						HttpURLConnection hc1 = (HttpURLConnection) url
+								.openConnection();
+						hc1.addRequestProperty("Range", "bytes=" + buffer + "-"
+								+ tmp);
+						hc1.setReadTimeout(10000);
+						hc1.connect();
+						UploadSessionAppendBuilder re1 = client.files
+								.uploadSessionAppendBuilder(sessionId, buffer);
+						re1.run(hc1.getInputStream());
+						hc1.disconnect();
+						buffer = tmp;
+					}
+				}
+				if ((tmp + 1) + buffer > size) {
+					// System.out.println(tmp + 1 + "\t" + size
+					// +"\t"+(tmp-size));
+					// finish
+					HttpURLConnection hc2 = (HttpURLConnection) url
+							.openConnection();
+					hc2.addRequestProperty("Range", "bytes=" + (tmp + 1) + "-"
+							+ size);
+					hc2.setReadTimeout(10000);
+					hc2.connect();
+					UploadSessionCursor usc = new UploadSessionCursor(
+							sessionId, (tmp + 1));
+					FileMetadata nn = client.files.uploadSessionFinishBuilder(
+							usc,
+							new CommitInfo("/" + fileName,
+									DbxFiles.WriteMode.add, false, new Date(),
+									false)).run(hc2.getInputStream());
+					// End
+					System.out.println("Done");
+					redirectAttrs.addFlashAttribute("AttributeName",
+							"Successfully uploaded to dropbox");
+				}
+			}
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UploadException e) {
+			e.printStackTrace();
+		} catch (DbxException e) {
+			e.printStackTrace();
+		}
+
 		return "redirect:/";
 	}
 
@@ -152,30 +201,33 @@ public class home {
 				long fileSizeInKB = fileSizeInBytes / 1024;
 				// Convert the KB to MegaBytes (1 MB = 1024 KBytes)
 				long fileSizeInMB = fileSizeInKB / 1024;
-				if(!fileEntry.getName().startsWith("."))
-				li.put(fileEntry.getName(), fileSizeInMB);
+				if (!fileEntry.getName().startsWith("."))
+					li.put(fileEntry.getName(), fileSizeInMB);
 			}
 		}
 		return li;
 	}
+
 	@RequestMapping(value = "/uploadFileUrl", method = RequestMethod.POST)
 	public String uploadFileHandlerown(final RedirectAttributes redirectAttrs,
-			@ModelAttribute("url_dd") String url_d, Model model) throws IOException {
+			@ModelAttribute("url_dd") String url_d, Model model)
+			throws IOException {
 		String message = "";
-		//String rootPath = System.getProperty("catalina.home");
-		//String name = file.getOriginalFilename();
-		String fileName = url_d.substring( url_d.lastIndexOf('/')+1, url_d.length() );
-        URL url = new URL(url_d);
-        BufferedInputStream bis = new BufferedInputStream(url.openStream());
-        FileOutputStream fis = new FileOutputStream(s+File.pathSeparator+fileName);
-        byte[] buffer = new byte[4096];
-        int count=0;
-        while((count = bis.read(buffer,0,4096)) != -1)
-        {
-            fis.write(buffer, 0, count);
-        }
-        fis.close();
-        bis.close();
+		// String rootPath = System.getProperty("catalina.home");
+		// String name = file.getOriginalFilename();
+		String fileName = url_d.substring(url_d.lastIndexOf('/') + 1,
+				url_d.length());
+		URL url = new URL(url_d);
+		BufferedInputStream bis = new BufferedInputStream(url.openStream());
+		FileOutputStream fis = new FileOutputStream(s + File.pathSeparator
+				+ fileName);
+		byte[] buffer = new byte[4096];
+		int count = 0;
+		while ((count = bis.read(buffer, 0, 4096)) != -1) {
+			fis.write(buffer, 0, count);
+		}
+		fis.close();
+		bis.close();
 		redirectAttrs.addFlashAttribute("AttributeName", message);
 		return "redirect:/";
 	}
@@ -313,16 +365,18 @@ public class home {
 		outStream.close();
 
 	}
-	
+
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String doDelete(@RequestParam("fname") String fname,
-			HttpServletRequest request, HttpServletResponse response,final RedirectAttributes redirectAttrs)
-			throws IOException {
-			File file = new File(s+"/"+fname);
-			file.delete();
-			System.out.println(s+File.pathSeparator+fname+" "+file.exists());
-			redirectAttrs.addFlashAttribute("AttributeName", "File "+fname+" deleted");
-			return "redirect:/";
+			HttpServletRequest request, HttpServletResponse response,
+			final RedirectAttributes redirectAttrs) throws IOException {
+		File file = new File(s + "/" + fname);
+		file.delete();
+		System.out
+				.println(s + File.pathSeparator + fname + " " + file.exists());
+		redirectAttrs.addFlashAttribute("AttributeName", "File " + fname
+				+ " deleted");
+		return "redirect:/";
 	}
 
 	/**
